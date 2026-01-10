@@ -1,0 +1,25 @@
+# Node / Nest.js
+node_modules/
+dist/
+coverage/
+.tmp/
+logs/
+*.log
+
+# Env files
+.env
+.env.*
+
+# IDE/editor
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing/Reports
+.nyc_output/
+
+# Package managers
+.pnpm-store/
