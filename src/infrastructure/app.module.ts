@@ -1,10 +1,9 @@
 import { Module } from '@nestjs/common';
-
-// AppModule keeps framework wiring separate from domain/application logic.
-// Controllers will live under infrastructure/controllers, providers under infrastructure/* adapters.
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { typeOrmConfig } from './repositories/typeorm.config';
 
 @Module({
-  imports: [],
+  imports: [TypeOrmModule.forRoot(typeOrmConfig)],
   controllers: [],
   providers: [],
 })
