@@ -2,7 +2,7 @@ import { PaymentGatewayPort, PaymentChargeRequest } from '../ports/payment.gatew
 import { TransactionRepositoryPort } from '../ports/transaction.repository.port';
 import { StockRepositoryPort } from '../ports/stock.repository.port';
 import { Result, ok, err } from 'shared/result';
-import { PaymentRejectedError, InvalidTransactionStateError } from 'domain/errors';
+import { PaymentRejectedError, InvalidTransactionStateError, TransactionNotFoundError } from 'domain/errors';
 import { TransactionStatus } from 'shared/transaction-status.enum';
 
 export class ProcessPaymentUseCase {
@@ -12,10 +12,10 @@ export class ProcessPaymentUseCase {
     private readonly stocks: StockRepositoryPort
   ) {}
 
-  async execute(req: PaymentChargeRequest): Promise<Result<{ paymentId: string }, PaymentRejectedError | InvalidTransactionStateError>> {
+  async execute(req: PaymentChargeRequest): Promise<Result<{ paymentId: string }, PaymentRejectedError | InvalidTransactionStateError | TransactionNotFoundError>> {
     const tx = await this.transactions.findById(req.transactionId);
     if (!tx) {
-      return err(new PaymentRejectedError(req.transactionId, 'Transaction not found'));
+      return err(new TransactionNotFoundError(req.transactionId));
     }
     if (tx.status !== TransactionStatus.PENDING) {
       return err(new InvalidTransactionStateError(req.transactionId, tx.status, TransactionStatus.PENDING));
