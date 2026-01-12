@@ -41,13 +41,13 @@ src/
 ```
 
 ## Contributing & Commits
-I'm follow Conventional Commits, e.g.:
+This project follows Conventional Commits, e.g.:
 - `feat: add stock reservation use case`
 - `fix: handle insufficient stock in checkout`
 - `chore: setup CI for lint and tests`
 
 ## Environment & DB Configuration
-1. Copiar `.env.example` a `.env` y ajustar:
+1. Copy `.env.example` to `.env` and adjust:
 
 ```
 DATABASE_URL=postgres://postgres:Pass@localhost:5432/wompi_store
@@ -57,56 +57,57 @@ WOMPI_BASE_URL=https://api-sandbox.co.uat.wompi.dev
 WOMPI_PRIVATE_KEY=prv_stagtest_XXXXXXXXXXXXXXXXXXXXXXXXXXXX
 ```
 
-2. Asegurarse de que la base `wompi_store` exista en PostgreSQL.
-3. El backend lee siempre `DATABASE_URL`, `WOMPI_BASE_URL` y `WOMPI_PRIVATE_KEY` desde `.env`.
+2. Make sure the `wompi_store` database exists in PostgreSQL.
+3. The backend always reads `DATABASE_URL`, `WOMPI_BASE_URL` and `WOMPI_PRIVATE_KEY` from `.env`.
 
-## Seed de datos (productos, stock y cliente demo)
+## Data seed (products, stock and demo customer)
 
-El seed está en `src/infrastructure/repositories/seed.ts` y se ejecuta con:
+The seed lives in `src/infrastructure/repositories/seed.ts` and is executed with:
 
 ```
 npm run seed
 ```
 
-Hace lo siguiente:
-- Crea tablas (via `synchronize: true`) si no existen.
-- Normaliza cualquier fila antigua en `stocks` que tenga `reserved = NULL` a `0`.
-- Inserta productos de ejemplo con `quantity = 100` y `reserved = 0`.
-- Crea (si no existe) un cliente demo `demo@customer.local` y muestra sus IDs en consola.
+It performs:
+- Creates tables (via `synchronize: true`) if they do not exist.
+- Normalizes any legacy rows in `stocks` that have `reserved = NULL` to `0`.
+- Inserts sample products with `quantity = 100` and `reserved = 0`.
+- Creates (if missing) a demo customer `demo@customer.local` and prints its IDs in the console.
 
-Esto hace que el proyecto sea reproducible en otras máquinas sin SQL manual.
+This makes the project reproducible on other machines without manual SQL.
 
-## Endpoints principales (flujo de compra)
+## Main endpoints (purchase flow)
 
-- `GET /health` → health check simple.
-- `GET /products` → lista productos con unidades disponibles.
-- `POST /stock/reserve` → reserva stock.
+- `GET /health` → simple health check.
+- `GET /products` → list products with available units.
+- `POST /stock/reserve` → reserve stock.
 	- Body: `{ "productId": string, "quantity": number }`.
-- `POST /transactions` → crea una transacción (estado inicial PENDING).
+- `POST /transactions` → create a transaction (initial state PENDING).
 	- Body: `{ "productId": string, "customerId": string, "quantity": number }`.
-- `POST /payments` → procesa el pago vía Wompi (UAT sandbox).
+- `POST /payments` → process payment via Wompi (UAT sandbox).
 	- Body: `{ "transactionId": string, "amount": number, "currency": "COP", "cardToken": string }`.
-- `POST /deliveries` → crea la entrega para una transacción pagada.
+- `POST /deliveries` → create a delivery for a paid transaction.
+- `GET /transactions/cart/:customerId` → aggregated cart summary for a customer.
 
-Los controladores son delgados; toda la lógica está en los use cases bajo `src/application/use-cases`.
+Controllers are thin; all business logic lives in use cases under `src/application/use-cases`.
 
-## Integración con Wompi (UAT Sandbox)
+## Wompi integration (UAT Sandbox)
 
-El adaptador Wompi vive en `src/infrastructure/gateways/wompi-payment.gateway.ts` e implementa `PaymentGatewayPort`.
+The Wompi adapter lives in `src/infrastructure/gateways/wompi-payment.gateway.ts` and implements `PaymentGatewayPort`.
 
-- Usa `WOMPI_BASE_URL` + `/v1/transactions` para crear cargos.
-- Usa `WOMPI_PRIVATE_KEY` (clave privada de backend) como `Authorization: Bearer ...`.
-- Mapea respuestas de error a un `PaymentRejectedError` con motivo legible.
+- Uses `WOMPI_BASE_URL` + `/v1/transactions` to create charges.
+- Uses `WOMPI_PRIVATE_KEY` (backend private key) as `Authorization: Bearer ...`.
+- Maps error responses to a `PaymentRejectedError` with a human-readable reason.
 
-Para probar un pago end‑to‑end en sandbox:
+To test an end‑to‑end payment in sandbox:
 
-1. Generar un `cardToken` usando la API pública de Wompi (sandbox), por ejemplo con curl o Postman:
+1. Generate a `cardToken` using the public Wompi API (sandbox), e.g. with curl or Postman:
 
 	 - URL: `POST https://api-sandbox.co.uat.wompi.dev/v1/tokens/cards`
 	 - Headers:
-		 - `Authorization: Bearer pub_stagtest_...` (llave pública UAT sandbox).
+		 - `Authorization: Bearer pub_stagtest_...` (UAT sandbox public key).
 		 - `Content-Type: application/json`.
-	 - Body de ejemplo:
+	 - Example body:
 		 ```json
 		 {
 			 "number": "4111111111111111",
@@ -116,35 +117,36 @@ Para probar un pago end‑to‑end en sandbox:
 			 "card_holder": "Juan Perez"
 		 }
 		 ```
-	 - De la respuesta, tomar `data.id` → `cardToken`.
+	 - From the response, take `data.id` → `cardToken`.
 
-2. Crear el flujo en este backend:
-	 - `GET /products` → elegir `productId`.
-	 - `POST /stock/reserve` → reservar stock.
-	 - `POST /transactions` → crear transacción y guardar `transactionId`.
-	 - `POST /payments` → enviar `transactionId`, `amount`, `currency` y `cardToken` obtenido de Wompi.
-	 - Opcional: `POST /deliveries` después de pago aprobado.
+2. Run the flow against this backend:
+	 - `GET /products` → pick a `productId`.
+	 - `POST /stock/reserve` → reserve stock.
+	 - `POST /transactions` → create a transaction and keep `transactionId`.
+	 - `POST /payments` → send `transactionId`, `amount`, `currency` and the `cardToken` obtained from Wompi.
+	 - Optional: `POST /deliveries` after payment is approved.
 
 ## Postman Manual Testing
 
-- Importar environment: `docs/postman/Wompi Store.postman_environment.json`.
-- Importar collection: `docs/postman/Wompi Store API.postman_collection.json`.
-- Verificar que `apiBaseUrl` apunta a `http://localhost:3000` o la URL donde corra el backend.
-- La colección contiene requests para:
+- Import environment: `docs/postman/Wompi Store.postman_environment.json`.
+- Import collection: `docs/postman/Wompi Store API.postman_collection.json`.
+- Ensure the `apiBaseUrl` variable points to `http://localhost:3000` or your backend URL.
+- The collection contains requests for:
 	- `GET /health`
 	- `GET /products`
 	- `POST /stock/reserve`
 	- `POST /transactions`
 	- `POST /payments`
 	- `POST /deliveries`
+	- `GET /transactions/cart/:customerId`
 
 ## Run & Tests
 
-- Desarrollo:
+- Development:
 	- `npm run start:dev`
-- Build + producción simple:
+- Build + simple production run:
 	- `npm run build`
 	- `npm start`
-- Tests unitarios y coverage:
+- Unit tests & coverage:
 	- `npm test`
 	- `npm run test:cov`
