@@ -16,6 +16,7 @@ import { ReserveStockUseCase } from 'application/use-cases/reserve-stock.usecase
 import { CreateTransactionUseCase } from 'application/use-cases/create-transaction.usecase';
 import { CreateDeliveryUseCase } from 'application/use-cases/create-delivery.usecase';
 import { ProcessPaymentUseCase } from 'application/use-cases/process-payment.usecase';
+import { GetCartSummaryUseCase } from 'application/use-cases/get-cart-summary.usecase';
 import { ProductsController } from './controllers/products.controller';
 import { StockController } from './controllers/stock.controller';
 import { TransactionsController } from './controllers/transactions.controller';
@@ -74,6 +75,14 @@ import { WompiPaymentGatewayAdapter } from './gateways/wompi-payment.gateway';
         stocks: TypeOrmStockRepository
       ) => new ProcessPaymentUseCase(payments, transactions, stocks),
       inject: [WompiPaymentGatewayAdapter, TypeOrmTransactionRepository, TypeOrmStockRepository],
+    },
+    {
+      provide: GetCartSummaryUseCase,
+      useFactory: (
+        transactions: TypeOrmTransactionRepository,
+        products: TypeOrmProductRepository,
+      ) => new GetCartSummaryUseCase(transactions, products),
+      inject: [TypeOrmTransactionRepository, TypeOrmProductRepository],
     },
   ],
 })

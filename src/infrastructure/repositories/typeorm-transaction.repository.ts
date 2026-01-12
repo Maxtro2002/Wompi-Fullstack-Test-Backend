@@ -53,4 +53,20 @@ export class TypeOrmTransactionRepository implements TransactionRepositoryPort {
       status: tx.status,
     };
   }
+
+  async findByCustomer(customerId: string): Promise<TransactionDto[]> {
+    const txs = await this.txRepo.find({
+      where: { customer: { id: customerId } },
+      relations: ['product', 'customer'],
+    });
+
+    return txs.map((tx) => ({
+      id: tx.id,
+      productId: tx.product.id,
+      customerId: tx.customer.id,
+      quantity: tx.quantity,
+      amount: Number(tx.amount),
+      status: tx.status,
+    }));
+  }
 }

@@ -72,6 +72,18 @@
       }
     },
     {
+      "name": "Get cart summary",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{apiBaseUrl}}/transactions/cart/<CUSTOMER_ID>",
+          "host": ["{{apiBaseUrl}}"],
+          "path": ["transactions", "cart", "<CUSTOMER_ID>"]
+        }
+      }
+    },
+    {
       "name": "Create delivery",
       "request": {
         "method": "POST",

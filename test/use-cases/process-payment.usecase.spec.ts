@@ -19,6 +19,7 @@ describe('ProcessPaymentUseCase', () => {
       create: jest.fn(),
       updateStatus: jest.fn().mockResolvedValue(undefined),
       findById: jest.fn(),
+      findByCustomer: jest.fn(),
     };
     stocks = {
       getByProductId: jest.fn(),

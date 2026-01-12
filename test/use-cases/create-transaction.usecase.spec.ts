@@ -13,6 +13,7 @@ describe('CreateTransactionUseCase', () => {
     create: jest.fn(),
     updateStatus: jest.fn(),
     findById: jest.fn(),
+    findByCustomer: jest.fn(),
   };
   const mockCustomers: CustomerRepositoryPort = {
     findById: jest.fn(),

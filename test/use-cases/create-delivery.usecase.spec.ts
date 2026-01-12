@@ -24,6 +24,7 @@ describe('CreateDeliveryUseCase', () => {
       create: jest.fn(),
       updateStatus: jest.fn(),
       findById: jest.fn(),
+      findByCustomer: jest.fn(),
     };
   });
 

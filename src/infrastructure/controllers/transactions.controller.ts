@@ -1,6 +1,7 @@
-import { Body, Controller, Post, BadRequestException } from '@nestjs/common';
+import { Body, Controller, Post, BadRequestException, Get, Param } from '@nestjs/common';
 import { IsUUID, IsInt, Min } from 'class-validator';
 import { CreateTransactionUseCase } from 'application/use-cases/create-transaction.usecase';
+import { GetCartSummaryUseCase } from 'application/use-cases/get-cart-summary.usecase';
 
 class CreateTransactionRequest {
   @IsUUID()
@@ -16,7 +17,10 @@ class CreateTransactionRequest {
 
 @Controller('transactions')
 export class TransactionsController {
-  constructor(private readonly createTransaction: CreateTransactionUseCase) {}
+  constructor(
+    private readonly createTransaction: CreateTransactionUseCase,
+    private readonly getCartSummary: GetCartSummaryUseCase,
+  ) {}
 
   @Post()
   async create(@Body() body: CreateTransactionRequest) {
@@ -30,5 +34,10 @@ export class TransactionsController {
       throw new BadRequestException({ code: failure.error.code, message: failure.error.message });
     }
     return result.value;
+  }
+
+  @Get('cart/:customerId')
+  async getCart(@Param('customerId') customerId: string) {
+    return this.getCartSummary.execute(customerId);
   }
 }

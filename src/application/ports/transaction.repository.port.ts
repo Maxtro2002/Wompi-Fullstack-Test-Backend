@@ -5,4 +5,5 @@ export interface TransactionRepositoryPort {
   create(data: Omit<TransactionDto, 'id' | 'status' | 'amount'> & { amount: number; status?: TransactionStatus }): Promise<TransactionDto>;
   updateStatus(id: string, status: TransactionStatus): Promise<void>;
   findById(id: string): Promise<TransactionDto | null>;
+  findByCustomer(customerId: string): Promise<TransactionDto[]>;
 }
