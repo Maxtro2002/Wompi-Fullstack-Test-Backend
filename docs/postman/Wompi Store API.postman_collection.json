@@ -1,0 +1,99 @@
+{
+  "info": {
+    "name": "Wompi Store API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Manual tests for Wompi Store backend. Sensitive DB configuration is read from server .env; Postman uses only API base URL."
+  },
+  "item": [
+    {
+      "name": "Health",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{apiBaseUrl}}/health",
+          "host": ["{{apiBaseUrl}}"],
+          "path": ["health"]
+        }
+      }
+    },
+    {
+      "name": "List products",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{apiBaseUrl}}/products",
+          "host": ["{{apiBaseUrl}}"],
+          "path": ["products"]
+        }
+      }
+    },
+    {
+      "name": "Reserve stock",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"productId\": \"<PRODUCT_ID_FROM_LIST>\",\n  \"quantity\": 1\n}"
+        },
+        "url": {
+          "raw": "{{apiBaseUrl}}/stock/reserve",
+          "host": ["{{apiBaseUrl}}"],
+          "path": ["stock", "reserve"]
+        }
+      }
+    },
+    {
+      "name": "Create transaction",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"productId\": \"<PRODUCT_ID_FROM_LIST>\",\n  \"customerId\": \"<CUSTOMER_ID_OR_UUID>\",\n  \"quantity\": 1\n}"
+        },
+        "url": {
+          "raw": "{{apiBaseUrl}}/transactions",
+          "host": ["{{apiBaseUrl}}"],
+          "path": ["transactions"]
+        }
+      }
+    },
+    {
+      "name": "Create delivery",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"transactionId\": \"<TRANSACTION_ID_FROM_CREATE>\",\n  \"addressLine1\": \"742 Evergreen Terrace\",\n  \"addressLine2\": \"Apt 1\",\n  \"city\": \"Springfield\",\n  \"state\": \"NA\",\n  \"postalCode\": \"00000\",\n  \"country\": \"US\"\n}"
+        },
+        "url": {
+          "raw": "{{apiBaseUrl}}/deliveries",
+          "host": ["{{apiBaseUrl}}"],
+          "path": ["deliveries"]
+        }
+      }
+    }
+  ],
+  "variable": [
+    { "key": "apiBaseUrl", "value": "http://localhost:3000" }
+  ]
+}

@@ -1,0 +1,22 @@
+import { Body, Controller, Post, BadRequestException } from '@nestjs/common';
+import { ReserveStockUseCase } from 'application/use-cases/reserve-stock.usecase';
+
+class ReserveStockRequest {
+  productId!: string;
+  quantity!: number;
+}
+
+@Controller('stock')
+export class StockController {
+  constructor(private readonly reserveStock: ReserveStockUseCase) {}
+
+  @Post('reserve')
+  async reserve(@Body() body: ReserveStockRequest) {
+    const result = await this.reserveStock.execute(body.productId, body.quantity);
+    if (!result.ok) {
+      const failure = result as { ok: false; error: any };
+      throw new BadRequestException({ code: failure.error.code, message: failure.error.message });
+    }
+    return result.value;
+  }
+}

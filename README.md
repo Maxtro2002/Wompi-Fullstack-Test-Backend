@@ -51,4 +51,26 @@ I'm follow Conventional Commits, e.g.:
 - Scaffold Nest.js app and basic configuration.
 - Choose ORM (TypeORM or Prisma) and set up PostgreSQL.
 - Define domain models and DB schema, then seed dummy products.
-- Expose API docs (Swagger) and publish a public URL.
+- Expose API docs (Postman) and publish a public URL.
+
+## Environment & DB Configuration
+- Copy `.env.example` to `.env` and set a single `DATABASE_URL`:
+
+```
+DATABASE_URL=postgres://postgres:Pass@localhost:5432/wompi_store
+```
+
+- Start PostgreSQL locally or via Docker, ensure the `wompi_store` database exists.
+- The backend reads `DATABASE_URL` from `.env`; no DB secrets live in Postman.
+
+## Postman Manual Testing
+- Import environment: `docs/postman/Wompi Store.postman_environment.json`.
+- Import collection: `docs/postman/Wompi Store API.postman_collection.json`.
+- Ensure the `apiBaseUrl` variable points to your running backend (default `http://localhost:3000`).
+- Note: Payment integration is not configured yet; start with health and products.
+
+## Run
+```
+npm run build
+npm start
+```
