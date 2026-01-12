@@ -20,6 +20,14 @@ async function run() {
   const stockRepo = dataSource.getRepository(Stock);
   const customerRepo = dataSource.getRepository(Customer);
 
+  // Normalize any legacy NULL reserved values to 0 to keep logic consistent
+  await stockRepo
+    .createQueryBuilder()
+    .update(Stock)
+    .set({ reserved: 0 })
+    .where('reserved IS NULL')
+    .execute();
+
   const products = [
     { name: 'Basic Tee', description: '100% cotton t-shirt', price: 29900 },
     { name: 'Sport Shoes', description: 'Lightweight running shoes', price: 189900 },

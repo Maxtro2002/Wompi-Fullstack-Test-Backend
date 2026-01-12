@@ -1,8 +1,13 @@
 import { Body, Controller, Post, BadRequestException } from '@nestjs/common';
+import { IsUUID, IsInt, Min } from 'class-validator';
 import { ReserveStockUseCase } from 'application/use-cases/reserve-stock.usecase';
 
 class ReserveStockRequest {
+  @IsUUID()
   productId!: string;
+
+  @IsInt()
+  @Min(1)
   quantity!: number;
 }
 

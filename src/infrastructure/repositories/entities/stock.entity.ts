@@ -10,10 +10,10 @@ export class Stock {
   @JoinColumn({ name: 'product_id' })
   product!: Product;
 
-  @Column({ type: 'int', default: 0 })
+  @Column({ type: 'int', default: 0, nullable: false })
   quantity!: number;
 
-  @Column({ type: 'int', default: 0 })
+  @Column({ type: 'int', default: 0, nullable: false })
   reserved!: number;
 
   @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })

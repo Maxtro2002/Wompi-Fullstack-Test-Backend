@@ -18,25 +18,29 @@ export class TypeOrmStockRepository implements StockRepositoryPort {
     if (!product) return null;
     const stock = await this.stockRepo.findOne({ where: { product: { id: productId } }, relations: ['product'] });
     if (!stock) return null;
+    const quantity = typeof stock.quantity === 'number' && Number.isFinite(stock.quantity) ? stock.quantity : 0;
+    const reserved = typeof stock.reserved === 'number' && Number.isFinite(stock.reserved) ? stock.reserved : 0;
     return {
       id: stock.id,
       productId: productId,
-      quantity: stock.quantity,
-      reserved: stock.reserved,
+      quantity,
+      reserved,
     };
   }
 
   async setReserved(productId: string, reserved: number): Promise<void> {
     const stock = await this.stockRepo.findOne({ where: { product: { id: productId } }, relations: ['product'] });
     if (!stock) return;
-    stock.reserved = reserved;
+    const safeReserved = typeof reserved === 'number' && Number.isFinite(reserved) && reserved >= 0 ? reserved : 0;
+    stock.reserved = safeReserved;
     await this.stockRepo.save(stock);
   }
 
   async setQuantity(productId: string, quantity: number): Promise<void> {
     const stock = await this.stockRepo.findOne({ where: { product: { id: productId } }, relations: ['product'] });
     if (!stock) return;
-    stock.quantity = quantity;
+    const safeQuantity = typeof quantity === 'number' && Number.isFinite(quantity) && quantity >= 0 ? quantity : 0;
+    stock.quantity = safeQuantity;
     await this.stockRepo.save(stock);
   }
 }

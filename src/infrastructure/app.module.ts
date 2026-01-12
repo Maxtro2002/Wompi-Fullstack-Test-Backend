@@ -15,18 +15,21 @@ import { ListProductsUseCase } from 'application/use-cases/list-products.usecase
 import { ReserveStockUseCase } from 'application/use-cases/reserve-stock.usecase';
 import { CreateTransactionUseCase } from 'application/use-cases/create-transaction.usecase';
 import { CreateDeliveryUseCase } from 'application/use-cases/create-delivery.usecase';
+import { ProcessPaymentUseCase } from 'application/use-cases/process-payment.usecase';
 import { ProductsController } from './controllers/products.controller';
 import { StockController } from './controllers/stock.controller';
 import { TransactionsController } from './controllers/transactions.controller';
 import { DeliveriesController } from './controllers/deliveries.controller';
 import { HealthController } from './controllers/health.controller';
+import { PaymentsController } from './controllers/payments.controller';
+import { WompiPaymentGatewayAdapter } from './gateways/wompi-payment.gateway';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot(typeOrmConfig),
     TypeOrmModule.forFeature([Product, Stock, Customer, Transaction, Delivery]),
   ],
-  controllers: [ProductsController, StockController, TransactionsController, DeliveriesController, HealthController],
+  controllers: [ProductsController, StockController, TransactionsController, DeliveriesController, HealthController, PaymentsController],
   providers: [
     // Adapters
     TypeOrmProductRepository,
@@ -34,6 +37,7 @@ import { HealthController } from './controllers/health.controller';
     TypeOrmCustomerRepository,
     TypeOrmTransactionRepository,
     TypeOrmDeliveryRepository,
+    WompiPaymentGatewayAdapter,
     // Use cases wired to adapters
     {
       provide: ListProductsUseCase,
@@ -61,6 +65,15 @@ import { HealthController } from './controllers/health.controller';
         transactions: TypeOrmTransactionRepository
       ) => new CreateDeliveryUseCase(deliveries, transactions),
       inject: [TypeOrmDeliveryRepository, TypeOrmTransactionRepository],
+    },
+    {
+      provide: ProcessPaymentUseCase,
+      useFactory: (
+        payments: WompiPaymentGatewayAdapter,
+        transactions: TypeOrmTransactionRepository,
+        stocks: TypeOrmStockRepository
+      ) => new ProcessPaymentUseCase(payments, transactions, stocks),
+      inject: [WompiPaymentGatewayAdapter, TypeOrmTransactionRepository, TypeOrmStockRepository],
     },
   ],
 })

@@ -1,9 +1,16 @@
 import { Body, Controller, Post, BadRequestException } from '@nestjs/common';
+import { IsUUID, IsInt, Min } from 'class-validator';
 import { CreateTransactionUseCase } from 'application/use-cases/create-transaction.usecase';
 
 class CreateTransactionRequest {
+  @IsUUID()
   productId!: string;
+
+  @IsUUID()
   customerId!: string;
+
+  @IsInt()
+  @Min(1)
   quantity!: number;
 }
 

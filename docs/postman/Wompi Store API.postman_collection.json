@@ -91,6 +91,27 @@
           "path": ["deliveries"]
         }
       }
+    },
+    {
+      "name": "Process payment",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"transactionId\": \"<TRANSACTION_ID_FROM_CREATE>\",\n  \"amount\": 2000,\n  \"currency\": \"COP\",\n  \"cardToken\": \"<CARD_TOKEN_FROM_FRONTEND>\"\n}"
+        },
+        "url": {
+          "raw": "{{apiBaseUrl}}/payments",
+          "host": ["{{apiBaseUrl}}"],
+          "path": ["payments"]
+        }
+      }
     }
   ],
   "variable": [
