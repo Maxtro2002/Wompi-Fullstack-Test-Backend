@@ -30,6 +30,27 @@
       }
     },
     {
+      "name": "Create or get customer",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"demo@customer.local\",\n  \"name\": \"Demo Customer\",\n  \"phone\": \"3000000000\"\n}"
+        },
+        "url": {
+          "raw": "{{apiBaseUrl}}/customers",
+          "host": ["{{apiBaseUrl}}"],
+          "path": ["customers"]
+        }
+      }
+    },
+    {
       "name": "Reserve stock",
       "request": {
         "method": "POST",

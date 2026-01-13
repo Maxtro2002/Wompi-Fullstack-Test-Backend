@@ -80,6 +80,8 @@ This makes the project reproducible on other machines without manual SQL.
 
 - `GET /health` → simple health check.
 - `GET /products` → list products with available units.
+- `POST /customers` → create or return a `customerId` for a given email/name (use this id in transactions/payments).
+	- Body: `{ "email": string, "name": string, "phone"?: string }` → Response: `{ "customerId": string }`.
 - `POST /stock/reserve` → reserve stock.
 	- Body: `{ "productId": string, "quantity": number }`.
 - `POST /transactions` → create a transaction (initial state PENDING).
