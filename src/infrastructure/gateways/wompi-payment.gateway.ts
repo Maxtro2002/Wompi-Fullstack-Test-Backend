@@ -8,7 +8,9 @@ export class WompiPaymentGatewayAdapter implements PaymentGatewayPort {
   private readonly privateKey: string | undefined;
 
   constructor() {
-    const baseURL = process.env.WOMPI_BASE_URL || 'https://sandbox.wompi.co';
+    // Use explicit sandbox base that includes the /v1 path.
+    // When `WOMPI_BASE_URL` is provided it must include the API version (e.g. https://sandbox.wompi.co/v1)
+    const baseURL = process.env.WOMPI_BASE_URL || 'https://sandbox.wompi.co/v1';
     this.privateKey = process.env.WOMPI_PRIVATE_KEY;
 
     this.client = axios.create({
@@ -25,8 +27,9 @@ export class WompiPaymentGatewayAdapter implements PaymentGatewayPort {
     }
 
     try {
+      // Post to the transactions endpoint relative to the base URL (base may already include /v1)
       const response = await this.client.post(
-        '/v1/transactions',
+        '/transactions',
         {
           amount_in_cents: Math.round(req.amount * 100),
           currency: req.currency,

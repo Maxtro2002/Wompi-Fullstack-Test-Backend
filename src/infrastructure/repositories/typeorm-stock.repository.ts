@@ -36,6 +36,24 @@ export class TypeOrmStockRepository implements StockRepositoryPort {
     await this.stockRepo.save(stock);
   }
 
+  async incrementReserved(productId: string, delta: number): Promise<number> {
+    // perform an atomic update at DB level to avoid lost updates (concurrent reservations)
+    const inc = typeof delta === 'number' && Number.isFinite(delta) ? Math.trunc(delta) : 0;
+    if (inc === 0) {
+      const s = await this.stockRepo.findOne({ where: { product: { id: productId } } });
+      return s ? (typeof s.reserved === 'number' ? s.reserved : 0) : 0;
+    }
+    await this.stockRepo
+      .createQueryBuilder()
+      .update(Stock)
+      .set({ reserved: () => `reserved + ${inc}` })
+      .where('product_id = :pid', { pid: productId })
+      .execute();
+
+    const updated = await this.stockRepo.findOne({ where: { product: { id: productId } } });
+    return updated ? (typeof updated.reserved === 'number' ? updated.reserved : 0) : 0;
+  }
+
   async setQuantity(productId: string, quantity: number): Promise<void> {
     const stock = await this.stockRepo.findOne({ where: { product: { id: productId } }, relations: ['product'] });
     if (!stock) return;

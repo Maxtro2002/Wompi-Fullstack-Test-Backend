@@ -6,16 +6,20 @@ describe('ReserveStockUseCase', () => {
   it('reserves stock when available', async () => {
     const mockStocks: StockRepositoryPort = {
       getByProductId: jest.fn().mockResolvedValue({ id: 's1', productId: 'p1', quantity: 10, reserved: 2 }),
-      setReserved: jest.fn().mockResolvedValue(undefined),
+      setReserved: jest.fn(),
       setQuantity: jest.fn(),
-    };
+      incrementReserved: jest.fn().mockResolvedValue(5),
+    } as any;
 
-    const uc = new ReserveStockUseCase(mockStocks);
-    const result = await uc.execute('p1', 3);
+    const mockReservations: any = { createReservation: jest.fn().mockResolvedValue(true) };
+
+    const uc = new ReserveStockUseCase(mockStocks, mockReservations);
+    const result = await uc.execute('p1', 3, 'c1');
     expect(result.ok).toBe(true);
     if (result.ok) {
       expect(result.value.reserved).toBe(5);
-      expect(mockStocks.setReserved).toHaveBeenCalledWith('p1', 5);
+      expect((mockStocks.incrementReserved as jest.Mock)).toHaveBeenCalledWith('p1', 3);
+      expect(mockReservations.createReservation).toHaveBeenCalledWith('p1', 'c1', 3);
     }
   });
 
@@ -24,10 +28,12 @@ describe('ReserveStockUseCase', () => {
       getByProductId: jest.fn().mockResolvedValue({ id: 's1', productId: 'p1', quantity: 5, reserved: 4 }),
       setReserved: jest.fn(),
       setQuantity: jest.fn(),
+      incrementReserved: jest.fn(),
     };
 
-    const uc = new ReserveStockUseCase(mockStocks);
-    const result = await uc.execute('p1', 3);
+    const mockReservations: any = { createReservation: jest.fn() };
+    const uc = new ReserveStockUseCase(mockStocks, mockReservations);
+    const result = await uc.execute('p1', 3, 'c1');
     expect(result.ok).toBe(false);
     if (!result.ok) {
       const failure = result as { ok: false; error: unknown };
@@ -40,10 +46,12 @@ describe('ReserveStockUseCase', () => {
       getByProductId: jest.fn().mockResolvedValue(null),
       setReserved: jest.fn(),
       setQuantity: jest.fn(),
+      incrementReserved: jest.fn(),
     };
 
-    const uc = new ReserveStockUseCase(mockStocks);
-    const result = await uc.execute('p1', 1);
+    const mockReservations: any = { createReservation: jest.fn() };
+    const uc = new ReserveStockUseCase(mockStocks, mockReservations);
+    const result = await uc.execute('p1', 1, 'c1');
     expect(result.ok).toBe(false);
     if (!result.ok) {
       const failure = result as { ok: false; error: unknown };

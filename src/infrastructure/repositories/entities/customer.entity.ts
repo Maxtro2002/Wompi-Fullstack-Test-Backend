@@ -15,6 +15,12 @@ export class Customer {
   @Column({ type: 'varchar', length: 30, nullable: true })
   phone?: string;
 
+  @Column({ type: 'varchar', length: 128, nullable: true, select: false })
+  passwordHash?: string;
+
+  @Column({ type: 'varchar', length: 64, nullable: true, select: false })
+  passwordSalt?: string;
+
   @OneToMany(() => Transaction, (tx) => tx.customer)
   transactions?: Transaction[];
 }

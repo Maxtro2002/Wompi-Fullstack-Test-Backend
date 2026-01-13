@@ -9,6 +9,9 @@ class ReserveStockRequest {
   @IsInt()
   @Min(1)
   quantity!: number;
+
+  @IsUUID()
+  customerId!: string;
 }
 
 @Controller('stock')
@@ -17,7 +20,7 @@ export class StockController {
 
   @Post('reserve')
   async reserve(@Body() body: ReserveStockRequest) {
-    const result = await this.reserveStock.execute(body.productId, body.quantity);
+    const result = await this.reserveStock.execute(body.productId, body.quantity, body.customerId);
     if (!result.ok) {
       const failure = result as { ok: false; error: any };
       throw new BadRequestException({ code: failure.error.code, message: failure.error.message });

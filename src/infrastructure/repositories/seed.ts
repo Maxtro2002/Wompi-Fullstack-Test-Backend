@@ -53,6 +53,23 @@ async function run() {
     );
   }
 
+  // Add test user smltrs00 with provided password (sandbox testing account)
+  // Password will be stored as a secure scrypt hash with random salt
+  const testEmail = 'smltrs00@wompi.sandbox';
+  const testPassword = 'ChallengeWompi123*';
+  let testUser = await customerRepo.findOne({ where: { email: testEmail } });
+  if (!testUser) {
+    // local import of crypto functions
+    const { randomBytes, scryptSync } = await import('crypto');
+    const salt = randomBytes(16).toString('hex');
+    const hash = scryptSync(testPassword, salt, 64).toString('hex');
+    const createdCustomer = customerRepo.create({ name: 'Wompi Sandbox User', email: testEmail, phone: null, passwordHash: hash, passwordSalt: salt } as unknown as Customer);
+    testUser = await customerRepo.save(createdCustomer as Customer);
+    console.log('Created test user', testEmail);
+  } else {
+    console.log('Test user already exists:', testEmail);
+  }
+
   // Print out IDs to help with Postman requests
   const allProducts = await productRepo.find();
   console.log('Seed completed.');

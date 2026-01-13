@@ -18,6 +18,8 @@ describe('CreateTransactionUseCase', () => {
   const mockCustomers: CustomerRepositoryPort = {
     findById: jest.fn(),
     findOrCreateByEmail: jest.fn(),
+    findOrCreateByEmailWithPassword: jest.fn(),
+    authenticate: jest.fn(),
   };
 
   beforeEach(() => {

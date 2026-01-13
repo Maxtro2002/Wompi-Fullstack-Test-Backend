@@ -83,13 +83,97 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"productId\": \"<PRODUCT_ID_FROM_LIST>\",\n  \"quantity\": 1\n}"
+          "raw": "{\n  \"productId\": \"<PRODUCT_ID_FROM_LIST>\",\n  \"quantity\": 1,\n  \"customerId\": \"<CUSTOMER_ID_OR_UUID>\"\n}"
         },
+        "description": "Reserve stock for a customer. Body requires `customerId` (UUID) to associate the reservation with the customer.",
         "url": {
           "raw": "{{apiBaseUrl}}/stock/reserve",
           "host": ["{{apiBaseUrl}}"],
           "path": ["stock", "reserve"]
         }
+      }
+    },
+    {
+      "name": "Create reservation (detailed)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"productId\": \"<PRODUCT_ID_FROM_LIST>\",\n  \"quantity\": 1,\n  \"customerId\": \"<CUSTOMER_ID_OR_UUID>\"\n}"
+        },
+        "url": {
+          "raw": "{{apiBaseUrl}}/reservations",
+          "host": ["{{apiBaseUrl}}"],
+          "path": ["reservations"]
+        },
+        "description": "Create a reservation linked to a customer. Returns the updated stock and reservation entries for the customer+product."
+      }
+    },
+      {
+        "name": "Set reservation (PUT)",
+        "request": {
+          "method": "PUT",
+          "header": [
+            { "key": "Content-Type", "value": "application/json" }
+          ],
+          "body": { "mode": "raw", "raw": "{\n  \"productId\": \"<PRODUCT_ID>\",\n  \"customerId\": \"<CUSTOMER_ID>\",\n  \"quantity\": 2\n}" },
+          "url": {
+            "raw": "{{apiBaseUrl}}/reservations",
+            "host": ["{{apiBaseUrl}}"],
+            "path": ["reservations"]
+          },
+          "description": "Set desired reservation quantity for a product and customer. The server will create/update and consolidate reservations so only one reservation exists per customer+product."
+        }
+      },
+    {
+      "name": "List reservations for customer",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{apiBaseUrl}}/reservations?customerId=<CUSTOMER_ID>",
+          "host": ["{{apiBaseUrl}}"],
+          "path": ["reservations"],
+          "query": [
+            { "key": "customerId", "value": "<CUSTOMER_ID>" }
+          ]
+        },
+        "description": "List all reservations for a given customer. Replace `<CUSTOMER_ID>` with the customer's UUID."
+      }
+    },
+    {
+      "name": "Update reservation quantity",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": { "mode": "raw", "raw": "{\n  \"quantity\": 2\n}" },
+        "url": {
+          "raw": "{{apiBaseUrl}}/reservations/<RESERVATION_ID>",
+          "host": ["{{apiBaseUrl}}"],
+          "path": ["reservations", "<RESERVATION_ID>"]
+        },
+        "description": "Adjust the quantity of an existing reservation. The server will apply the delta to stock.reserved atomically."
+      }
+    },
+    {
+      "name": "Delete reservation",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{apiBaseUrl}}/reservations/<RESERVATION_ID>",
+          "host": ["{{apiBaseUrl}}"],
+          "path": ["reservations", "<RESERVATION_ID>"]
+        },
+        "description": "Delete a reservation and decrement the reserved stock accordingly. Replace `<RESERVATION_ID>` with the reservation UUID."
       }
     },
     {
@@ -106,6 +190,7 @@
           "mode": "raw",
           "raw": "{\n  \"productId\": \"<PRODUCT_ID_FROM_LIST>\",\n  \"customerId\": \"<CUSTOMER_ID_OR_UUID>\",\n  \"quantity\": 1\n}"
         },
+        "description": "Create a transaction. If the customer has existing reservations for this product, they will be consumed and used as the transaction quantity.",
         "url": {
           "raw": "{{apiBaseUrl}}/transactions",
           "host": ["{{apiBaseUrl}}"],
@@ -123,7 +208,10 @@
           "host": ["{{apiBaseUrl}}"],
           "path": ["transactions", "cart", "<CUSTOMER_ID>"]
         }
-      }
+        ,
+        "description": "Get aggregated cart summary for a customer. Replace `<CUSTOMER_ID>` with the customer's UUID. Reservations are included in the summary.",
+        "response": []
+        }
     },
     {
       "name": "Create delivery",
@@ -165,6 +253,61 @@
           "host": ["{{apiBaseUrl}}"],
           "path": ["payments"]
         }
+      }
+    },
+    {
+      "name": "Create Wompi widget payload",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"amount\": 20.00,\n  \"currency\": \"COP\",\n  \"customerEmail\": \"demo@customer.local\",\n  \"redirectUrl\": \"https://your.app/return\"\n}"
+        },
+        "url": {
+          "raw": "{{apiBaseUrl}}/payments/widget",
+          "host": ["{{apiBaseUrl}}"],
+          "path": ["payments", "widget"]
+        },
+        "description": "Generates payload for Wompi widget (publicKey, reference, amountInCents, currency, signature). The frontend uses this data to open the Wompi checkout widget."
+      }
+    },
+    {
+      "name": "Set cart item (PUT)",
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": { "mode": "raw", "raw": "{\n  \"productId\": \"<PRODUCT_ID>\",\n  \"customerId\": \"<CUSTOMER_ID>\",\n  \"quantity\": 2\n}" },
+        "url": {
+          "raw": "{{apiBaseUrl}}/cart/items",
+          "host": ["{{apiBaseUrl}}"],
+          "path": ["cart", "items"]
+        },
+        "description": "Set desired quantity for a product in the customer's cart. Server will create/delete/update reservations accordingly."
+      }
+    },
+    {
+      "name": "Delete cart item",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{apiBaseUrl}}/cart/items?productId=<PRODUCT_ID>&customerId=<CUSTOMER_ID>",
+          "host": ["{{apiBaseUrl}}"],
+          "path": ["cart", "items"],
+          "query": [
+            { "key": "productId", "value": "<PRODUCT_ID>" },
+            { "key": "customerId", "value": "<CUSTOMER_ID>" }
+          ]
+        },
+        "description": "Remove all reservations for product/customer and decrement reserved stock. Replace placeholders before sending."
       }
     }
   ],

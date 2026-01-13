@@ -25,6 +25,7 @@ describe('ProcessPaymentUseCase', () => {
       getByProductId: jest.fn(),
       setReserved: jest.fn().mockResolvedValue(undefined),
       setQuantity: jest.fn(),
+      incrementReserved: jest.fn().mockResolvedValue(0),
     };
     payments = {
       charge: jest.fn(),
