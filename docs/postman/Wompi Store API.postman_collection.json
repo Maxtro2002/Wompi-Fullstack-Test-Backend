@@ -41,12 +41,33 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"email\": \"demo@customer.local\",\n  \"name\": \"Demo Customer\",\n  \"phone\": \"3000000000\"\n}"
+          "raw": "{\n  \"email\": \"demo@customer.local\",\n  \"name\": \"Demo Customer\",\n  \"phone\": \"3000000000\",\n  \"password\": \"testpass123\"\n}"
         },
         "url": {
           "raw": "{{apiBaseUrl}}/customers",
           "host": ["{{apiBaseUrl}}"],
           "path": ["customers"]
+        }
+      }
+    },
+    {
+      "name": "Login (email + password)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"smltrs00@wompi.sandbox\",\n  \"password\": \"ChallengeWompi123*\"\n}"
+        },
+        "url": {
+          "raw": "{{apiBaseUrl}}/auth/login",
+          "host": ["{{apiBaseUrl}}"],
+          "path": ["auth", "login"]
         }
       }
     },

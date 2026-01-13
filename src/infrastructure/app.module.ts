@@ -23,6 +23,8 @@ import { TransactionsController } from './controllers/transactions.controller';
 import { DeliveriesController } from './controllers/deliveries.controller';
 import { HealthController } from './controllers/health.controller';
 import { PaymentsController } from './controllers/payments.controller';
+import { CustomersController } from './controllers/customers.controller';
+import { AuthController } from './controllers/auth.controller';
 import { WompiPaymentGatewayAdapter } from './gateways/wompi-payment.gateway';
 
 @Module({
@@ -30,7 +32,7 @@ import { WompiPaymentGatewayAdapter } from './gateways/wompi-payment.gateway';
     TypeOrmModule.forRoot(typeOrmConfig),
     TypeOrmModule.forFeature([Product, Stock, Customer, Transaction, Delivery]),
   ],
-  controllers: [ProductsController, StockController, TransactionsController, DeliveriesController, HealthController, PaymentsController],
+  controllers: [ProductsController, StockController, TransactionsController, DeliveriesController, HealthController, PaymentsController, CustomersController, AuthController],
   providers: [
     // Adapters
     TypeOrmProductRepository,

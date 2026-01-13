@@ -76,12 +76,22 @@ It performs:
 
 This makes the project reproducible on other machines without manual SQL.
 
+Note: the seed now also creates a sandbox test customer to mirror the provided Wompi test user credentials:
+
+- Email: `smltrs00@wompi.sandbox`
+- Password: `ChallengeWompi123*`
+
+Use this account only in the local/dev sandbox; do NOT use it in production.
+
 ## Main endpoints (purchase flow)
 
 - `GET /health` → simple health check.
 - `GET /products` → list products with available units.
 - `POST /customers` → create or return a `customerId` for a given email/name (use this id in transactions/payments).
-	- Body: `{ "email": string, "name": string, "phone"?: string }` → Response: `{ "customerId": string }`.
+	- Body: `{ "email": string, "name": string, "phone"?: string, "password"?: string }` → Response: `{ "customerId": string }`.
+		- If `password` is provided and a customer with that email exists, the backend will attempt to authenticate; on success returns the `customerId`.
+		- If `password` is provided and the customer does not exist, the backend will create the customer and store a secure password hash (used for future authentication).
+		- If no `password` is provided, the endpoint will create or return the customer without setting a password.
 - `POST /stock/reserve` → reserve stock.
 	- Body: `{ "productId": string, "quantity": number }`.
 - `POST /transactions` → create a transaction (initial state PENDING).
@@ -90,6 +100,8 @@ This makes the project reproducible on other machines without manual SQL.
 	- Body: `{ "transactionId": string, "amount": number, "currency": "COP", "cardToken": string }`.
 - `POST /deliveries` → create a delivery for a paid transaction.
 - `GET /transactions/cart/:customerId` → aggregated cart summary for a customer.
+
+- `POST /auth/login` → login with `email` + `password`. Returns `{ "customerId": string }` on success.
 
 Controllers are thin; all business logic lives in use cases under `src/application/use-cases`.
 
